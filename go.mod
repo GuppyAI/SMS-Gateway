@@ -3,6 +3,7 @@ module sms-gateway
 go 1.21.9
 
 require (
+	github.com/knadh/koanf/providers/confmap v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/v2 v2.1.1
 	github.com/rs/zerolog v1.32.0

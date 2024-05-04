@@ -102,7 +102,9 @@ func (receiver *receiverImpl) Listen(handler func(gsmExt.Message)) {
 	}
 
 	config := configuration.GetConfig()
-	pollingTimeout := config.Duration("sms.polling_timeout") * time.Millisecond
+	pollingTimeout := config.Duration("sms.polling")
+
+	log.Debug().Dur("polling", pollingTimeout).Msg("Starting to poll for SMS messages...")
 
 	for {
 		select {
