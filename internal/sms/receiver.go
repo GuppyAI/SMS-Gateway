@@ -115,7 +115,7 @@ func (receiver *receiverImpl) Listen(handler func(gsmExt.Message)) {
 
 				resetErr := receiver.modemProvider.ResetModem()
 				if resetErr != nil {
-					log.Error().
+					log.Fatal().
 						Err(resetErr).
 						Msg("Could not reset modem after error occurred while polling for new messages.")
 				}
