@@ -29,9 +29,8 @@ func NewBroker(handler MessageHandler) Broker {
 // AddMessageChannel adds a new message channel to the message channel pool
 func (broker *brokerImpl) AddMessageChannel(channel MessageChannel) {
 	broker.lock.Lock()
-	defer broker.lock.Unlock()
-
 	broker.channels[channel.GetSupportedSchema()] = channel
+	broker.lock.Unlock()
 
 	err := channel.ReceiveMessages(broker)
 	if err != nil {
