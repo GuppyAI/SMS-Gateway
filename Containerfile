@@ -19,6 +19,6 @@ FROM scratch
 
 WORKDIR /usr/bin
 
-COPY --from=builder /app/build/gateway-latest ./latest
+COPY --from=builder /app/build/gateway-latest ./gateway
 
 ENTRYPOINT ["/usr/bin/gateway"]
