@@ -22,7 +22,9 @@ func Load() error {
 	}
 
 	allowlist := k.String("messaging.allowlist")
-	err := k.Set("messaging.allowlist", strings.Split(allowlist, ","))
+	err := k.Set("messaging.allowlist", strings.FieldsFunc(allowlist, func(r rune) bool {
+		return r == ','
+	}))
 	if err != nil {
 		return err
 	}
