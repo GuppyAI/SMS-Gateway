@@ -21,7 +21,8 @@ func Load() error {
 		return err
 	}
 
-	allowlist := k.String("messaging.allowlist")
+	allowlist := strings.TrimSpace(k.String("messaging.allowlist"))
+
 	err := k.Set("messaging.allowlist", strings.FieldsFunc(allowlist, func(r rune) bool {
 		return r == ','
 	}))

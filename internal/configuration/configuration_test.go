@@ -50,3 +50,15 @@ func TestLoad_MessagingAllowList_MultipleEntries(t *testing.T) {
 	assert.Contains(t, allowlist, "test://two")
 	assert.Contains(t, allowlist, "test://three")
 }
+
+func TestLoad_MessagingAllowList_Whitespace(t *testing.T) {
+	t.Setenv("GATEWAY_MESSAGING_ALLOWLIST", "test://withWhitespace   	")
+
+	if err := Load(); err != nil {
+		t.Fatal(err)
+	}
+
+	allowlist := GetConfig().Strings("messaging.allowlist")
+	assert.Equal(t, 1, len(allowlist))
+	assert.Contains(t, allowlist, "test://withWhitespace")
+}
