@@ -30,7 +30,7 @@ func TestProviderImpl_ResetModem(t *testing.T) {
 	}
 
 	gsm.EXPECT().
-		Init(at.WithCmds("ATZ", "+CPMS=SM,SM,SM")).
+		Init(at.WithCmds("Z", "+CPMS=SM,SM,SM")).
 		Return(nil).
 		Times(1)
 

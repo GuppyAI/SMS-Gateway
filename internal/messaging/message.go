@@ -7,6 +7,17 @@ const (
 	Response      = 1
 )
 
+func (kind Kind) String() string {
+	switch kind {
+	case 0:
+		return "Request"
+	case 1:
+		return "Response"
+	default:
+		return "Unknown"
+	}
+}
+
 // Message is used to model messages
 type Message struct {
 	kind    Kind
