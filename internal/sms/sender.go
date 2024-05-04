@@ -2,6 +2,7 @@ package sms
 
 import (
 	"github.com/rs/zerolog/log"
+	"github.com/warthog618/sms"
 	"sms-gateway/internal/gsm"
 )
 
@@ -23,28 +24,39 @@ func NewSender(modemProvider gsm.ModemProvider) (Sender, error) {
 }
 
 // SendSMS uses the given Modem to send an SMS.
-// Will use the Modem.SendShortMessage method when the message has a maximum of 160 characters and the Modem.SendLongMessage otherwise.
 func (sender *senderImpl) SendSMS(phoneNumber string, message string) error {
 	modem := sender.modemProvider.GetModem()
 
 	var logger = log.With().Str("phone_number", phoneNumber).Str("message", message).Logger()
 
-	var err error
+	numberOption := sms.To(phoneNumber)
 
-	if len(message) <= 160 {
-		logger.Debug().Msg("Sending short message")
-		_, err = modem.SendShortMessage(phoneNumber, message)
-	} else {
-		logger.Debug().Msg("Sending long message")
-		_, err = modem.SendLongMessage(phoneNumber, message)
+	pdus, err := sms.Encode([]byte(message), numberOption)
+	if err != nil {
+		return err
 	}
 
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msgf("Error occurred while trying to send SMS message")
+	var binaryPdus [][]byte
 
-		return err
+	for _, pdu := range pdus {
+		binaryPdu, err := pdu.MarshalBinary()
+		if err != nil {
+			logger.Error().
+				Err(err).
+				Msg("Error occurred when trying to marshal PDU to binary! Aborting transfer of message...")
+			return err
+		}
+
+		binaryPdus = append(binaryPdus, binaryPdu)
+	}
+
+	logger.Debug().Int("pduCount", len(pdus)).Msg("Proceeding to send message PDUs...")
+
+	for _, binaryPdu := range binaryPdus {
+		if _, err := modem.SendPDU(binaryPdu); err != nil {
+			logger.Error().Err(err).Msg("Error occurred when trying to send binary pdu! Aborting transfer of remaining PDUs if there are any...")
+			return err
+		}
 	}
 
 	return nil
