@@ -1,4 +1,4 @@
-.PHONY: all mocks test deps container
+.PHONY: all mocks test deps container container/podman container/buildah container/docker
 
 GO=go
 GOTEST=$(GO) test
@@ -9,8 +9,11 @@ GORUN=$(GO) run
 
 MOCKGEN=~/go/bin/mockgen
 
-CONTAINERBUILD=buildah bud
+CONTAINERBUILD_BUILDAH=buildah bud
+CONTAINERBUILD_PODMAN=podman build .
+CONTAINERBUILD_DOCKER=docker build . -f Containerfile
 
+ARTIFACT=ghcr.io/guppyai/sms-gateway/gateway
 VERSION=latest
 
 all: test build container
@@ -24,8 +27,16 @@ build: deps
 	$(GOMOD) download
 	$(GOBUILD) -o ./build/gateway-$(VERSION) ./cmd/main.go
 
-container:
-	$(CONTAINERBUILD) -t gateway:$(VERSION)
+container: container/buildah
+
+container/podman:
+	$(CONTAINERBUILD_PODMAN) -t $(ARTIFACT):$(VERSION)
+
+container/buildah:
+	$(CONTAINERBUILD_BUILDAH) -t $(ARTIFACT):$(VERSION)
+
+container/docker:
+	$(CONTAINERBUILD_DOCKER) -t $(ARTIFACT):$(VERSION)
 
 test: deps
 	$(GOTEST) -v ./...
