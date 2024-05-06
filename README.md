@@ -1,4 +1,6 @@
-# SMS Gateway
+# SMS-Gateway
+
+The GuppyAI SMS-Gateway is used for sending and receiving SMS messages in the GuppyAI application. It will push received messages to a message queue and pull pending responses from it.
 
 # Configuration
 
@@ -32,6 +34,13 @@ The coverage report can be found in the "coverage" folder. "coverage.txt" contai
 Building has only been tested on Linux with an amd64 processor.
 Other operating systems or processor architectures are currently unsupported even though they'll likely compile the code just fine.
 
+*General prerequisites:*
+
+- Accessible modem device
+  - This one is a bit tricky, and you'll probably need to experiment with udev rules and kernel modules to get your modem working correctly. Please look up documentation or tutorials on your modem chip for this. The important thing is that you'll need a modem that is accessibly using a tty device (e.g. /dev/ttyUSB1)
+- `dialout` group must be set for your current user, if you're not root
+  - `usermod -aG dialout $USER`
+
 ## Native
 
 *Prerequisites:*
@@ -53,7 +62,8 @@ The built binary can be found in the "build" folder.
 
 - Buildah (preferred for building)
 - Podman 4 or newer (preferred for running)
-- Docker (if you really want to)
+- Make
+- Docker (if you really want to, however docker is not recommended and unsupported)
 
 *Building:*
 
@@ -71,12 +81,16 @@ podman run --group-add keep-groups \
     --device=/dev/ttyUSBxy \
     -e GATEWAY_SMS_MODEM_BAUD=115200 \
     -e GATEWAY_SMS_MODEM_DEVICE=/dev/ttyUSBxy \
-    -e GATEWAY_LOGGING_LEVEL=info \
     -e GATEWAY_MESSAGING_ALLOWLIST=sms://<PHONE_NUMBER> \
     gateway:latest
 ```
 
-_Other container runtimes are not supported. However, the docker run command should be pretty similar to this one._
+*Known issues:*
+
+- When using rootless containers, only the crun runtime is supported as runc does not support sharing supplementary groups (i.e. the dialout group needed to access the modem)
+- The `dialout` group needs to be set to run the container. Even if you are running the container rootful.
+
+_Other container tools like docker or containerd are unsupported!_
 
 # Copyright
 
