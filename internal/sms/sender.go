@@ -50,7 +50,7 @@ func (sender *senderImpl) SendSMS(phoneNumber string, message string) error {
 		binaryPdus = append(binaryPdus, binaryPdu)
 	}
 
-	logger.Debug().Int("pduCount", len(pdus)).Msg("Proceeding to send message PDUs...")
+	logger.Debug().Int("pdu_count", len(pdus)).Msg("Proceeding to send message PDUs...")
 
 	for _, binaryPdu := range binaryPdus {
 		if _, err := modem.SendPDU(binaryPdu); err != nil {
