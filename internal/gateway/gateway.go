@@ -72,7 +72,7 @@ func initializeSMS(broker messaging.Broker) error {
 	var modemIO io.ReadWriter = serialPort
 
 	if tracing {
-		modemIO = trace.New(serialPort)
+		modemIO = trace.New(serialPort, trace.WithLogger(logging.NewModemTracer(log.With().Logger())))
 	}
 
 	modem := gsmExt.New(at.New(modemIO))
