@@ -2,6 +2,16 @@
 
 The GuppyAI SMS-Gateway is used for sending and receiving SMS messages in the GuppyAI application. It will push received messages to a message queue and pull pending responses from it.
 
+# Can I use this?
+
+Yes, you're free to do with it whatever the GPL-3.0 License permits you to do. 
+However, if your question is whether you can use this for any actual use case you have, the answer is probably not (without some major adjustment).
+
+This application was written for a very tight use case. We use it with a Brovi/Huawei 4G USB Dongle E3372-325.
+To activate modem mode we used this very helpful guide by Pavel Piatruk (@ezbik): [Huawei E3372-325 'BROVI' and Linux (Ubuntu) - Stick mode.](https://blog.tanatos.org/posts/huawei_e3372h-325_brovi_with_linux_stickmode/)
+
+For using this application your SIM card has to be configured to not require a PIN.
+
 # Configuration
 
 | Environment variable        | Description                                                      | Default   | Possible values                                                               |
