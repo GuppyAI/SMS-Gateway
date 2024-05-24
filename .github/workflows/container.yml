@@ -31,7 +31,8 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
-          containerfile: ./Containerfile
+          containerfiles: |
+            ./Containerfile
 
       # Push the image to GHCR (Image Registry)
       - name: Push To GHCR
