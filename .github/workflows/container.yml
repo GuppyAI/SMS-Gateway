@@ -19,17 +19,10 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-      matrix:
-        install_latest: [ true, false ]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install latest podman
-        if: matrix.install_latest
-        run: |
-          bash .github/install_latest_podman.sh
 
       # Build image using Buildah action
       - name: Build Image
