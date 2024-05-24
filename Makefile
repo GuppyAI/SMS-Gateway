@@ -75,3 +75,7 @@ mocks:
 	$(MOCKGEN) -source=./internal/messaging/broker.go -package=messaging -destination=./internal/messaging/mock_broker.go
 	$(MOCKGEN) -source=./internal/messaging/message_handler.go -package=messaging -destination=./internal/messaging/mock_message_handler.go
 	$(MOCKGEN) -source=./internal/messaging/message_channel.go -package=messaging -destination=./internal/messaging/mock_message_channel.go
+
+setup:
+	sudo modprobe option
+	sudo bash -c "echo 3566 2001 ff > /sys/bus/usb-serial/drivers/option1/new_id"
