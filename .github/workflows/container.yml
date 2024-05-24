@@ -1,6 +1,8 @@
 name: Push to GHCR
 on:
   push:
+    branches:
+      - '**'
     tags: 
       - '**'
 
