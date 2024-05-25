@@ -31,11 +31,6 @@ func (broker *brokerImpl) AddMessageChannel(channel MessageChannel) {
 	broker.lock.Lock()
 	broker.channels[channel.GetSupportedSchema()] = channel
 	broker.lock.Unlock()
-
-	err := channel.ReceiveMessages(broker)
-	if err != nil {
-		log.Error().Err(err).Msg("Error occurred while receiving messages")
-	}
 }
 
 // Publish publishes messages
