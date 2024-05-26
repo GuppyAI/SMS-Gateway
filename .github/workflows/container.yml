@@ -31,5 +31,5 @@ jobs:
 
       - name: 'Build Inventory Image'
         run: |
-          docker build . --tag ${{ env.FULL_IMAGE_NAME }}:latest --tag ${{ env.FULL_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          docker build . -f Containerfile --tag ${{ env.FULL_IMAGE_NAME }}:latest --tag ${{ env.FULL_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           docker push -a ${{ env.FULL_IMAGE_NAME }}
