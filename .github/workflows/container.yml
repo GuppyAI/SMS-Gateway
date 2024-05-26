@@ -9,12 +9,16 @@ env:
     IMAGE_TAGS: ${{ github.ref_name }}
     IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
     REGISTRY_USER: ${{ github.actor }}
-    REGISTRY_PASSWORD: ${{ github.token }}
+    REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   push-ghcr:
     name: Build and push image
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
     strategy:
       fail-fast: false
       matrix:
