@@ -4,10 +4,9 @@ on:
   workflow_dispatch:
 
 env:
-    IMAGE_NAME: sms-gateway
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
     IMAGE_TAG: ${{ github.ref_name }}
-    IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
-    FULL_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.ref_name }}
 
 jobs:
   push-ghcr:
@@ -19,17 +18,19 @@ jobs:
       attestations: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: 'Login to GitHub Container Registry'
-        uses: docker/login-action@v1
+    
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3.1.0
         with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Build Inventory Image'
-        run: |
-          docker build . -f Containerfile --tag ${{ env.FULL_IMAGE_NAME }}:latest --tag ${{ env.FULL_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          docker push -a ${{ env.FULL_IMAGE_NAME }}
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v5.3.0
+        with:
+          context: .
+          file: Containerfile
+          push: true
+          tags: "latest,${{ env.IMAGE_TAG }}"
