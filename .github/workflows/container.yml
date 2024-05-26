@@ -6,7 +6,6 @@ on:
 env:
     REGISTRY: ghcr.io
     IMAGE_NAME: ${{ github.repository }}
-    IMAGE_TAG: ${{ github.ref_name }}
 
 jobs:
   push-ghcr:
@@ -18,6 +17,11 @@ jobs:
       attestations: write
 
     steps:
+
+      - name: Get current date
+        id: date
+        run: |
+          echo "RELEASE_DATE=$(date +"%y%m%d%H%M%S")" >> ${GITHUB_ENV}
     
       - name: Log in to the Container registry
         uses: docker/login-action@v3.1.0
@@ -33,4 +37,4 @@ jobs:
           context: .
           file: Containerfile
           push: true
-          tags: "latest,${{ env.IMAGE_TAG }}"
+          tags: "latest,${{ env.RELEASE_DATE }}"
