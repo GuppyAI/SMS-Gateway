@@ -17,6 +17,8 @@ jobs:
       attestations: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Get current date
         id: date
