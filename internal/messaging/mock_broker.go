@@ -50,6 +50,20 @@ func (mr *MockBrokerMockRecorder) AddMessageChannel(arg0 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMessageChannel", reflect.TypeOf((*MockBroker)(nil).AddMessageChannel), arg0)
 }
 
+// GetSupportedSchemas mocks base method.
+func (m *MockBroker) GetSupportedSchemas() []AddressSchema {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSupportedSchemas")
+	ret0, _ := ret[0].([]AddressSchema)
+	return ret0
+}
+
+// GetSupportedSchemas indicates an expected call of GetSupportedSchemas.
+func (mr *MockBrokerMockRecorder) GetSupportedSchemas() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSupportedSchemas", reflect.TypeOf((*MockBroker)(nil).GetSupportedSchemas))
+}
+
 // Publish mocks base method.
 func (m *MockBroker) Publish(arg0 Message) {
 	m.ctrl.T.Helper()

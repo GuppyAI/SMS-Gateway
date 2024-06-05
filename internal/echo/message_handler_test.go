@@ -2,7 +2,6 @@ package echo
 
 import (
 	"go.uber.org/mock/gomock"
-	"sms-gateway/internal/application_context"
 	"sms-gateway/internal/messaging"
 	"testing"
 )
@@ -11,9 +10,7 @@ func TestMessageHandler_Handle(t *testing.T) {
 	controller := gomock.NewController(t)
 	broker := messaging.NewMockBroker(controller)
 
-	application_context.Init(broker)
-
-	handler := New()
+	handler := New(broker)
 
 	address := messaging.NewAddress("test", "testingAddress")
 	message := messaging.NewMessage(messaging.Request, *address, "Message Content")

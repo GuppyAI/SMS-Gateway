@@ -4,7 +4,7 @@ type Kind int
 
 const (
 	Request  Kind = 0
-	Response      = 1
+	Response Kind = 1
 )
 
 func (kind Kind) String() string {
