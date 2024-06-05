@@ -4,11 +4,11 @@ go 1.21.9
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v1.7.1
-	github.com/avast/retry-go v2.7.0+incompatible
+	github.com/avast/retry-go/v4 v4.6.0
 	github.com/knadh/koanf/providers/confmap v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/v2 v2.1.1
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
 	github.com/warthog618/modem v0.4.0
 	github.com/warthog618/sms v0.3.0

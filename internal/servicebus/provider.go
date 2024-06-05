@@ -1,4 +1,4 @@
-package service_bus
+package servicebus
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 )
 
 type Provider interface {
-	GetReceiver() (*azservicebus.Receiver, error)
-	GetSender() (*azservicebus.Sender, error)
+	GetReceiver() (Receiver, error)
+	GetSender() (Sender, error)
 }
 
 type providerImpl struct {
@@ -37,14 +37,14 @@ func NewProvider() (Provider, error) {
 	}, nil
 }
 
-func (p *providerImpl) GetReceiver() (*azservicebus.Receiver, error) {
+func (p *providerImpl) GetReceiver() (Receiver, error) {
 	config := configuration.GetConfig()
 	queue := config.String("servicebus.receiver.queue")
 
 	return p.receiverClient.NewReceiverForQueue(queue, nil)
 }
 
-func (p *providerImpl) GetSender() (*azservicebus.Sender, error) {
+func (p *providerImpl) GetSender() (Sender, error) {
 	config := configuration.GetConfig()
 	queue := config.String("servicebus.sender.queue")
 

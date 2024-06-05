@@ -1,4 +1,4 @@
-package service_bus
+package servicebus
 
 import (
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
@@ -20,8 +20,12 @@ func toServiceBusMessage(message messaging.Message) *azservicebus.Message {
 func toInternalMessage(message *azservicebus.ReceivedMessage) (*messaging.Message, error) {
 	body := string(message.Body)
 
-	addressProperty := message.ApplicationProperties["address"].(string)
-	address, err := messaging.ParseAddress(addressProperty)
+	addressProperty := message.ApplicationProperties["address"]
+	if addressProperty == nil {
+		return nil, messaging.ErrInvalidAddressFormat
+	}
+
+	address, err := messaging.ParseAddress(addressProperty.(string))
 	if err != nil {
 		return nil, err
 	}

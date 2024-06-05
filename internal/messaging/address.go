@@ -7,6 +7,8 @@ import (
 
 type AddressSchema string
 
+var ErrInvalidAddressFormat = errors.New("invalid address format")
+
 const (
 	SMS   AddressSchema = "sms"
 	EMail               = "email"
@@ -28,7 +30,7 @@ func ParseAddress(addressString string) (*Address, error) {
 	parts := strings.Split(addressString, "://")
 
 	if len(parts) != 2 {
-		return nil, errors.New("invalid address format")
+		return nil, ErrInvalidAddressFormat
 	}
 
 	var schema AddressSchema
@@ -38,6 +40,8 @@ func ParseAddress(addressString string) (*Address, error) {
 		schema = SMS
 	case "email":
 		schema = EMail
+	default:
+		return nil, ErrInvalidAddressFormat
 	}
 
 	return NewAddress(schema, parts[1]), nil

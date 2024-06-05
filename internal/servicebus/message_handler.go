@@ -1,16 +1,15 @@
-package service_bus
+package servicebus
 
 import (
 	"context"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"sms-gateway/internal/messaging"
 )
 
 type MessageHandler struct {
-	sender *azservicebus.Sender
+	sender Sender
 }
 
-func NewMessageHandler(sender *azservicebus.Sender) (*MessageHandler, error) {
+func NewMessageHandler(sender Sender) (*MessageHandler, error) {
 	return &MessageHandler{sender}, nil
 }
 

@@ -2,12 +2,11 @@ package gateway
 
 import (
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
-	"sms-gateway/internal/service_bus"
+	"sms-gateway/internal/servicebus"
 )
 
-func initializeServiceBus() (*azservicebus.Sender, *azservicebus.Receiver, error) {
-	provider, err := service_bus.NewProvider()
+func initializeServiceBus() (servicebus.Sender, servicebus.Receiver, error) {
+	provider, err := servicebus.NewProvider()
 	if err != nil {
 		return nil, nil, fmt.Errorf("initializing service bus provider: %w", err)
 	}

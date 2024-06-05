@@ -7,7 +7,7 @@ import (
 	"sms-gateway/internal/configuration"
 	"sms-gateway/internal/logging"
 	"sms-gateway/internal/messaging"
-	"sms-gateway/internal/service_bus"
+	"sms-gateway/internal/servicebus"
 	"strings"
 )
 
@@ -38,7 +38,7 @@ func Execute() error {
 		return err
 	}
 
-	handler, err := service_bus.NewMessageHandler(sender)
+	handler, err := servicebus.NewMessageHandler(sender)
 	if err != nil {
 		return err
 	}
@@ -52,9 +52,7 @@ func Execute() error {
 		return err
 	}
 
-	if err := service_bus.NewServiceBusListener(receiver).Listen(func(message *messaging.Message) {
-		broker.Publish(*message)
-	}); err != nil {
+	if err := servicebus.NewServiceBusListener(receiver).Listen(broker); err != nil {
 		return err
 	}
 

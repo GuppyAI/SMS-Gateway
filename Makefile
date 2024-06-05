@@ -76,6 +76,11 @@ mocks:
 	$(MOCKGEN) -source=./internal/messaging/message_handler.go -package=messaging -destination=./internal/messaging/mock_message_handler.go
 	$(MOCKGEN) -source=./internal/messaging/message_channel.go -package=messaging -destination=./internal/messaging/mock_message_channel.go
 
+	# servicebus package
+
+	$(MOCKGEN) -source=./internal/servicebus/receiver.go -package=servicebus -destination=./internal/servicebus/mock_receiver.go
+	$(MOCKGEN) -source=./internal/servicebus/sender.go -package=servicebus -destination=./internal/servicebus/mock_sender.go
+
 setup:
 	sudo modprobe option
 	sudo bash -c "echo 3566 2001 ff > /sys/bus/usb-serial/drivers/option1/new_id"

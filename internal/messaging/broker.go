@@ -9,27 +9,34 @@ import (
 type Broker interface {
 	AddMessageChannel(MessageChannel)
 	Publish(Message)
+	GetSupportedSchemas() []AddressSchema
 }
 
 // brokerImpl is used to interact with the pubsub architecture
 type brokerImpl struct {
-	channels map[AddressSchema]MessageChannel
-	handler  MessageHandler
-	lock     sync.RWMutex
+	supportedSchemas []AddressSchema
+	channels         map[AddressSchema]MessageChannel
+	handler          MessageHandler
+	lock             sync.RWMutex
 }
 
 // NewBroker constructs a new brokerImpl
 func NewBroker(handler MessageHandler) Broker {
 	return &brokerImpl{
-		channels: map[AddressSchema]MessageChannel{},
-		handler:  handler,
+		supportedSchemas: []AddressSchema{},
+		channels:         map[AddressSchema]MessageChannel{},
+		handler:          handler,
 	}
 }
 
 // AddMessageChannel adds a new message channel to the message channel pool
 func (broker *brokerImpl) AddMessageChannel(channel MessageChannel) {
 	broker.lock.Lock()
-	broker.channels[channel.GetSupportedSchema()] = channel
+
+	supportedSchema := channel.GetSupportedSchema()
+	broker.supportedSchemas = append(broker.supportedSchemas, supportedSchema)
+	broker.channels[supportedSchema] = channel
+
 	broker.lock.Unlock()
 }
 
@@ -76,6 +83,10 @@ func (broker *brokerImpl) Publish(message Message) {
 		})(channels)
 	}
 
+}
+
+func (broker *brokerImpl) GetSupportedSchemas() []AddressSchema {
+	return broker.supportedSchemas
 }
 
 func (broker *brokerImpl) allowListCheck(address Address) bool {
