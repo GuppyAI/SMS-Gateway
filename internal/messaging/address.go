@@ -11,7 +11,7 @@ var ErrInvalidAddressFormat = errors.New("invalid address format")
 
 const (
 	SMS   AddressSchema = "sms"
-	EMail               = "email"
+	EMail AddressSchema = "email"
 )
 
 type Address struct {

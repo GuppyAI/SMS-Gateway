@@ -56,13 +56,12 @@ func Execute() error {
 		return err
 	}
 
-	for {
-		select {
-		case err := <-errorChannel:
-			log.Error().Err(err).Msg("Error occurred in message channel!")
-			return err
-		}
+	for err := range errorChannel {
+		log.Error().Err(err).Msg("Error occurred in message channel!")
+		return err
 	}
+
+	return nil
 }
 
 func setupMessageChannels(errorChannel chan error, broker messaging.Broker) error {

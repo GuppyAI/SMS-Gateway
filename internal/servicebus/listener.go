@@ -56,8 +56,6 @@ func (listener *Listener) Listen(broker messaging.Broker) error {
 				return err
 			}
 		}
-
-		return nil
 	}
 }
 
