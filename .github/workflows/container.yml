@@ -1,0 +1,59 @@
+name: Push to GHCR
+on:
+  push:
+  workflow_dispatch:
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  push-ghcr:
+    name: Build and push image
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get current date
+        id: date
+        run: |
+          echo "RELEASE_DATE=$(date +"%y%m%d%H%M%S")" >> ${GITHUB_ENV}
+      
+      - name: set lower case repo name
+        run: |
+          echo "REPO_LC=${REPO,,}" >>${GITHUB_ENV}
+        env:
+          REPO: '${{ github.repository }}'
+
+      - name: set lower case ref name
+        run: |
+          echo "REF_LC=${REPO,,}" >>${GITHUB_ENV}
+        env:
+          REPO: '${{ github.ref_name }}'
+
+      - name: Buildah Action
+        id: build_image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: my-new-image
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}
+          containerfiles: |
+            ./Containerfile
+            
+      - name: Push To GHCR
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        with:
+          image: ${{ steps.build_image.outputs.image }}
+          tags: ${{ steps.build_image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          extra-args: |
+            --disable-content-trust
