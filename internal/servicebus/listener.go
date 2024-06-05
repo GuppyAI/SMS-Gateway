@@ -9,12 +9,12 @@ import (
 	"sms-gateway/internal/messaging"
 )
 
-type ServiceBusListener struct {
+type Listener struct {
 	receiver Receiver
 }
 
-func NewServiceBusListener(receiver Receiver) *ServiceBusListener {
-	return &ServiceBusListener{receiver}
+func NewListener(receiver Receiver) *Listener {
+	return &Listener{receiver}
 }
 
 // Listen will listen for new messages on the service bus and handle them by converting them to messaging.Message and
@@ -22,7 +22,7 @@ func NewServiceBusListener(receiver Receiver) *ServiceBusListener {
 // Messages of unsupported schema will be marked as abandoned by this gateway.
 // If an error occurs while retrieving, converting or handling a message, it will retry three times and then return the
 // error.
-func (listener *ServiceBusListener) Listen(broker messaging.Broker) error {
+func (listener *Listener) Listen(broker messaging.Broker) error {
 	for {
 		var messages []*azservicebus.ReceivedMessage
 
@@ -65,7 +65,7 @@ func (listener *ServiceBusListener) Listen(broker messaging.Broker) error {
 // checks if it is supported by the given messaging.Broker and publishes it on the given messaging.Broker.
 // The azservicebus.ReceivedMessage will be handed back to the queue as abandoned if its schema is not supported by this gateway.
 // If there is a conversion error, the azservicebus.ReceivedMessage will be sent to the dead letter queue.
-func (listener *ServiceBusListener) handleMessage(message *azservicebus.ReceivedMessage, broker messaging.Broker) error {
+func (listener *Listener) handleMessage(message *azservicebus.ReceivedMessage, broker messaging.Broker) error {
 	logger := log.With().Str("message_id", message.MessageID).Logger()
 
 	responseMessage, err := toInternalMessage(message)
@@ -74,7 +74,7 @@ func (listener *ServiceBusListener) handleMessage(message *azservicebus.Received
 		// Therefore, it will be sent to the dead letter queue and this method does not return an error.
 		logger.Error().Err(err).Msg("Could not convert service bus message to internal message!")
 
-		if deadLetterErr := listener.receiver.DeadLetterMessage(context.TODO(), message, nil); err != nil {
+		if deadLetterErr := listener.receiver.DeadLetterMessage(context.TODO(), message, nil); deadLetterErr != nil {
 			logger.Error().Err(deadLetterErr).Msg("Could not dead letter message after message conversion failed!")
 			return deadLetterErr
 		}

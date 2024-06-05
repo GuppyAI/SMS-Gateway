@@ -52,7 +52,7 @@ func Execute() error {
 		return err
 	}
 
-	if err := servicebus.NewServiceBusListener(receiver).Listen(broker); err != nil {
+	if err := servicebus.NewListener(receiver).Listen(broker); err != nil {
 		return err
 	}
 
