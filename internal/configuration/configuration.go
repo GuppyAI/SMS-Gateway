@@ -15,9 +15,10 @@ func Load() error {
 	log.Info().Msg("Loading configuration...")
 
 	defaults := confmap.Provider(map[string]interface{}{
-		"logging.level":  "WARN",
-		"sms.polling":    5 * time.Second,
-		"sms.modem.baud": 115200,
+		"logging.level":      "WARN",
+		"sms.polling":        5 * time.Second,
+		"sms.modem.baud":     115200,
+		"messaging.channels": "sms",
 	}, ".")
 
 	if err := k.Load(defaults, nil); err != nil {
@@ -47,4 +48,12 @@ func Load() error {
 
 func GetConfig() *koanf.Koanf {
 	return k
+}
+
+func ValidateConfig() error {
+	if len(k.Strings("messaging.allowlist")) == 0 {
+		log.Warn().Msg("STARTING WITHOUT AN ALLOWLIST! THIS IS PROBABLY NOT INTENDED!")
+	}
+
+	return nil
 }

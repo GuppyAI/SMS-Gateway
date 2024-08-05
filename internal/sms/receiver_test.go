@@ -32,11 +32,8 @@ func TestReceiverImpl_Listen_Polling(t *testing.T) {
 		/* DO NOTHING */
 	})
 
-	for {
-		select {
-		case <-successful:
-			return
-		}
+	for range successful {
+		return
 	}
 }
 
@@ -64,11 +61,8 @@ func TestReceiverImpl_Listen_PollingError(t *testing.T) {
 		/* DO NOTHING */
 	})
 
-	for {
-		select {
-		case <-successful:
-			return
-		}
+	for range successful {
+		return
 	}
 }
 
@@ -103,14 +97,11 @@ func TestReceiverImpl_Listen_ReceiveMessage(t *testing.T) {
 		successful <- true
 	})
 
-	for {
-		select {
-		case success := <-successful:
-			if success {
-				return
-			}
-
-			t.FailNow()
+	for success := range successful {
+		if success {
+			return
 		}
+
+		t.FailNow()
 	}
 }

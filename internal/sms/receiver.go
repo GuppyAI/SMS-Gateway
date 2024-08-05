@@ -106,21 +106,18 @@ func (receiver *receiverImpl) Listen(handler func(gsmExt.Message)) {
 
 	log.Debug().Dur("polling", pollingTimeout).Msg("Starting to poll for SMS messages...")
 
-	for {
-		select {
-		case <-time.After(pollingTimeout):
-			_, err := modem.Command("+CMGL=4")
-			if err != nil {
-				log.Error().
-					Err(err).
-					Msg("Error occurred while polling for new messages. Resetting modem...")
+	for range time.After(pollingTimeout) {
+		_, err := modem.Command("+CMGL=4")
+		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("Error occurred while polling for new messages. Resetting modem...")
 
-				resetErr := receiver.modemProvider.ResetModem()
-				if resetErr != nil {
-					log.Fatal().
-						Err(resetErr).
-						Msg("Could not reset modem after error occurred while polling for new messages.")
-				}
+			resetErr := receiver.modemProvider.ResetModem()
+			if resetErr != nil {
+				log.Fatal().
+					Err(resetErr).
+					Msg("Could not reset modem after error occurred while polling for new messages.")
 			}
 		}
 	}

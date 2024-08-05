@@ -33,7 +33,7 @@ jobs:
 
       - name: set lower case ref name
         run: |
-          echo "REF_LC=${REPO,,}" >>${GITHUB_ENV}
+          echo "REF_LC=${REPO,,}" | tr / _ >>${GITHUB_ENV}
         env:
           REPO: '${{ github.ref_name }}'
 

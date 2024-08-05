@@ -16,8 +16,6 @@ func TestBrokerImpl_SendMessage(t *testing.T) {
 	channel := NewMockMessageChannel(controller)
 	channel.EXPECT().GetSupportedSchema().Return(AddressSchema("test"))
 
-	channel.EXPECT().ReceiveMessages(broker).Times(1)
-
 	broker.AddMessageChannel(channel)
 
 	address := NewAddress("test", "testingAddress")
@@ -42,8 +40,6 @@ func TestBrokerImpl_ReceiveMessage(t *testing.T) {
 
 	channel := NewMockMessageChannel(controller)
 	channel.EXPECT().GetSupportedSchema().Return(AddressSchema("test"))
-
-	channel.EXPECT().ReceiveMessages(broker).Times(1)
 
 	broker.AddMessageChannel(channel)
 
@@ -76,8 +72,6 @@ func TestBrokerImpl_ReceiveMessage_AddressNotAllowed(t *testing.T) {
 	channel := NewMockMessageChannel(controller)
 	channel.EXPECT().GetSupportedSchema().Return(AddressSchema("test"))
 
-	channel.EXPECT().ReceiveMessages(broker).Times(1)
-
 	broker.AddMessageChannel(channel)
 
 	address := NewAddress("test", "testingAddress")
@@ -100,8 +94,6 @@ func TestBrokerImpl_SendMessage_AddressNotAllowed(t *testing.T) {
 
 	channel := NewMockMessageChannel(controller)
 	channel.EXPECT().GetSupportedSchema().Return(AddressSchema("test"))
-
-	channel.EXPECT().ReceiveMessages(broker).Times(1)
 
 	broker.AddMessageChannel(channel)
 
