@@ -15,7 +15,7 @@ COPY internal/ ./internal
 
 RUN make build
 
-FROM scratch
+FROM alpine:3.20
 
 USER 1000:1000
 
