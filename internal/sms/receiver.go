@@ -106,7 +106,7 @@ func (receiver *receiverImpl) Listen(handler func(gsmExt.Message)) {
 
 	log.Debug().Dur("polling", pollingTimeout).Msg("Starting to poll for SMS messages...")
 
-	for range time.After(pollingTimeout) {
+	for range time.Tick(pollingTimeout) {
 		_, err := modem.Command("+CMGL=4")
 		if err != nil {
 			log.Error().
