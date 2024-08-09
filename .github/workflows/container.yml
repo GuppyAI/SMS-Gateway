@@ -11,6 +11,9 @@ jobs:
   push-ghcr:
     name: Build and push image
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        arch: [amd64, arm64v8]
     permissions:
       contents: read
       packages: write
@@ -42,10 +45,12 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: my-new-image
-          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}
+          archs: ${{ matrix.arch }}
+          build-args: ARCH=${{  matrix.arch }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest-${{ matrix.arch }} ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-${{ matrix.arch }}
           containerfiles: |
             ./Containerfile
-            
+
       - name: Push To GHCR
         uses: redhat-actions/push-to-registry@v2
         id: push
