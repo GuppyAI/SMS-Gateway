@@ -5,6 +5,7 @@ import (
 	"github.com/warthog618/modem/at"
 	gsmExt "github.com/warthog618/modem/gsm"
 	"go.uber.org/mock/gomock"
+	"sms-gateway/internal/configuration"
 	"sms-gateway/internal/gsm"
 	"testing"
 )
@@ -19,6 +20,12 @@ func TestReceiverImpl_Listen_Polling(t *testing.T) {
 	}
 
 	successful := make(chan bool)
+
+	t.Setenv("GATEWAY_SMS_POLLING", "1s")
+
+	if err := configuration.Load(); err != nil {
+		t.Fatal(err)
+	}
 
 	modem := gsm.NewMockModem(controller)
 	modem.EXPECT().AddIndication("+CMT:", gomock.Any(), at.WithTrailingLine)
