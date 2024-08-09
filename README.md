@@ -1,6 +1,7 @@
 # SMS-Gateway
 
-The GuppyAI SMS-Gateway is used for sending and receiving SMS messages in the GuppyAI application. It will push received messages to a message queue and pull pending responses from it.
+The GuppyAI SMS-Gateway is used for sending and receiving SMS messages in the GuppyAI application.
+It will push received messages to a message queue (Azure Service Bus) and pull pending responses from it.
 
 # Can I use this?
 
@@ -12,16 +13,23 @@ To activate modem mode we used this very helpful guide by Pavel Piatruk (@ezbik)
 
 For using this application your SIM card has to be configured to not require a PIN.
 
+If you happen to have the exact same model of USB Dongle on hand, you can use the `make setup` command to set up the stick
+for modem mode before starting the application.
+
 # Configuration
 
-| Environment variable        | Description                                                      | Default   | Possible values                                                               |
-|-----------------------------|------------------------------------------------------------------|-----------|-------------------------------------------------------------------------------|
-| GATEWAY_LOGGING_LEVEL       | Logging level                                                    | WARN      | TRACE, DEBUG, INFO, WARN, DEBUG                                               |
-| GATEWAY_MESSAGING_ALLOWLIST | List of addresses that are allowed to use the gateway's services | NOT SET   | Comma-separated list of addresses, e.g. "sms://+4900000000,sms://+4911111111" |
-| GATEWAY_SMS_TRACING         | Tracing of modem commands                                        | 0 (false) | 0 (false), 1 (true)                                                           |
-| GATEWAY_SMS_MODEM_DEVICE    | Modem device                                                     | NOT SET   | e.g. /dev/ttyUSB1                                                             |
-| GATEWAY_SMS_MODEM_BAUD      | Modem baud                                                       | 115200    | Depends on your hardware                                                      |
-| GATEWAY_SMS_POLLING         | Time between polls for new SMS messages                          | 5s        | Any duration                                                                  | 
+| Environment variable                          | Description                                                      | Default   | Possible values                                                                                                                                   |
+|-----------------------------------------------|------------------------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| GATEWAY_LOGGING_LEVEL                         | Logging level                                                    | WARN      | TRACE, DEBUG, INFO, WARN, DEBUG                                                                                                                   |
+| GATEWAY_MESSAGING_ALLOWLIST                   | List of addresses that are allowed to use the gateway's services | NOT SET   | Comma-separated list of addresses, e.g. "sms://+4900000000,sms://+4911111111"                                                                     |
+| GATEWAY_SMS_TRACING                           | Tracing of modem commands                                        | 0 (false) | 0 (false), 1 (true)                                                                                                                               |
+| GATEWAY_SMS_MODEM_DEVICE                      | Modem device                                                     | NOT SET   | e.g. /dev/ttyUSB1                                                                                                                                 |
+| GATEWAY_SMS_MODEM_BAUD                        | Modem baud                                                       | 115200    | Depends on your hardware                                                                                                                          |
+| GATEWAY_SMS_POLLING                           | Time between polls for new SMS messages                          | 5s        | Any duration                                                                                                                                      |
+| GATEWAY_SERVICE_BUS_RECEIVER_QUEUE            | Queue to receive SMS messages from                               | NOT SET   | A valid queue name                                                                                                                                |
+| GATEWAY_SERVICE_BUS_SENDER_QUEUE              | Queue to send SMS messages received through the modem to         | NOT SET   | A valid queue name                                                                                                                                |
+| GATEWAY_SERVICE_BUS_RECEIVER_CONNECTIONSTRING | Connection String used to connect to the receiver queue          | NOT SET   | A valid azure service bus connection string (Format: "Endpoint=sb://some_bus.example.org/;SharedAccessKeyName=Gateway;SharedAccessKey=SecretKey") |
+| GATEWAY_SERVICE_BUS_SENDER_CONNECTIONSTRING   | Connection String used to connect to the sender queue            | NOT SET   | A valid azure service bus connection string (Format: "Endpoint=sb://some_bus.example.org/;SharedAccessKeyName=Gateway;SharedAccessKey=SecretKey") |
 
 # Testing
 
@@ -92,7 +100,11 @@ podman run --group-add keep-groups \
     -e GATEWAY_SMS_MODEM_BAUD=115200 \
     -e GATEWAY_SMS_MODEM_DEVICE=/dev/ttyUSBxy \
     -e GATEWAY_MESSAGING_ALLOWLIST=sms://<PHONE_NUMBER> \
-    gateway:latest
+    -e GATEWAY_SERVICEBUS_RECEIVER_QUEUE=<RECEIVER_QUEUE> \
+    -e GATEWAY_SERVICEBUS_SENDER_QUEUE=<SENDER_QUEUE> \
+    -e GATEWAY_SERVICEBUS_RECEIVER_CONNECTIONSTRING=<RECEIVER_CONNECTIONSTRING> \
+    -e GATEWAY_SERVICEBUS_SENDER_CONNECTIONSTRING=<SENDER_CONNECTIONSTRING> \
+    ghcr.io/guppyai/sms-gateway:latest
 ```
 
 *Known issues:*
