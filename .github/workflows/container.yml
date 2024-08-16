@@ -45,25 +45,36 @@ jobs:
         env:
           REPO: '${{ github.ref_name }}'
 
+      - name: Buildah Action (amd64)
+        id: build_image_arm
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: my-new-image
+          archs: arm64v8
+          build-args: ARCH=arm64v8
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-arm64v8
+          containerfiles: |
+            ./Containerfile
+
       - name: Buildah Action
         id: build_image
         uses: redhat-actions/buildah-build@v2
         with:
           image: my-new-image
-          archs: ${{ matrix.arch }}
-          build-args: ARCH=${{  matrix.arch }}
-          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest-${{ matrix.arch }} ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-${{ matrix.arch }}
+          archs: amd64
+          build-args: ARCH=amd64
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-amd64
           containerfiles: |
             ./Containerfile
 
+      - name: Create manifest
+        id: create_manifest
+        run: |
+          buildah manifest create ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-arm64v8 ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-amd64
+          buildah manifest tag ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest
+
       - name: Push To GHCR
-        uses: redhat-actions/push-to-registry@v2
-        id: push
-        with:
-          image: ${{ steps.build_image.outputs.image }}
-          tags: ${{ steps.build_image.outputs.tags }}
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          extra-args: |
-            --disable-content-trust
+        id: push_manifest
+        run: |
+          buildah login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io/guppyai/sms-gateway
+          buildah manifest push --all ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest
