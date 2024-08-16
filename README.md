@@ -114,6 +114,20 @@ podman run --group-add keep-groups \
 
 _Other container tools like docker or containerd are unsupported!_
 
+### Tags
+
+The CI/CD pipeline in this repository will build container images for every push made.
+
+They will be of the following format: YYMMddHHmmss<BRANCH_NAME>
+The manifests stored at these tags will provide an image for each of the following platforms:
+
+- linux/arm64v8
+- linux/amd64
+
+Also, the latest built image will have the `latest` tag.
+However, beware that the `latest` tag will also be applied to images built on other branches than main. 
+Therefore, it is not adviceable to use it for any other usecase than caching.
+
 # Copyright
 
 GuppyAI SMS-Gateway (c) 2024 Lucca Greschner and contributors
