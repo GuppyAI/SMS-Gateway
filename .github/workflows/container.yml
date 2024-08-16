@@ -11,9 +11,6 @@ jobs:
   push-ghcr:
     name: Build and push image
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        arch: [amd64, arm64]
     permissions:
       contents: read
       packages: write
@@ -45,7 +42,7 @@ jobs:
         env:
           REPO: '${{ github.ref_name }}'
 
-      - name: Buildah Action (amd64)
+      - name: Buildah Action (arm64v8)
         id: build_image_arm
         uses: redhat-actions/buildah-build@v2
         with:
@@ -56,8 +53,8 @@ jobs:
           containerfiles: |
             ./Containerfile
 
-      - name: Buildah Action
-        id: build_image
+      - name: Buildah Action (amd64)
+        id: build_image_amd64
         uses: redhat-actions/buildah-build@v2
         with:
           image: my-new-image
