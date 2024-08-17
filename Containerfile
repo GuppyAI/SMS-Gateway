@@ -1,5 +1,4 @@
-ARG ARCH=amd64
-FROM ${ARCH}/golang:1.21.9-alpine3.19 as builder
+FROM golang:1.21.9-alpine3.19 as builder
 
 WORKDIR /app
 
@@ -16,7 +15,7 @@ COPY internal/ ./internal
 
 RUN make build
 
-FROM ${ARCH}/alpine:3.20
+FROM alpine:3.20
 
 USER 1000:1000
 
