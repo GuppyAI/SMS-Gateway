@@ -17,6 +17,11 @@ jobs:
       attestations: write
 
     steps:
+      - name: Install qemu dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -37,23 +42,44 @@ jobs:
         env:
           REPO: '${{ github.ref_name }}'
 
-      - name: Buildah Action
-        id: build_image
+      - name: Buildah Action (arm64v8)
+        id: build_image_arm
         uses: redhat-actions/buildah-build@v2
         with:
           image: my-new-image
-          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}
+          archs: arm64v8
+          build-args: ARCH=arm64v8
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-arm64v8
           containerfiles: |
             ./Containerfile
-            
+
+      - name: Buildah Action (amd64)
+        id: build_image_amd64
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: my-new-image
+          archs: amd64
+          build-args: ARCH=amd64
+          tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}-amd64
+          containerfiles: |
+            ./Containerfile
+
       - name: Push To GHCR
         uses: redhat-actions/push-to-registry@v2
         id: push
         with:
-          image: ${{ steps.build_image.outputs.image }}
-          tags: ${{ steps.build_image.outputs.tags }}
+          image: ${{ env.REGISTRY }}/${{ env.REPO_LC }}
+          tags: ${{ steps.build_image_arm.outputs.tags }} ${{ steps.build_image_amd64.outputs.tags }} 
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           extra-args: |
             --disable-content-trust
+
+      - name: Create and push manifest
+        id: create_manifest
+        run: |
+          buildah manifest create ${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} ${{ steps.build_image_arm.outputs.image-with-tag }} ${{ steps.build_image_amd64.outputs.image-with-tag }}
+          buildah login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io/guppyai/sms-gateway
+          buildah manifest push ${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} docker://${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }}
+          buildah manifest push ${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} docker://${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest
