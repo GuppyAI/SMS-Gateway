@@ -47,7 +47,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: my-new-image
-          archs: arm64 amd64
+          archs: arm64,amd64
           tags: ${{ env.REGISTRY }}/${{ env.REPO_LC }}:${{ env.RELEASE_DATE }}${{ env.REF_LC }} ${{ env.REGISTRY }}/${{ env.REPO_LC }}:latest
           containerfiles: |
             ./Containerfile
